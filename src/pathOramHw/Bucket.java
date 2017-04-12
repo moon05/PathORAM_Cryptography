@@ -23,6 +23,7 @@ public class Bucket{
 			throw new RuntimeException("Please set bucket size before creating a bucket");
 		}
 		//TODO Must complete this method for submission
+		BucketBlocks = new ArrayList<Block>(max_size_Z);
 	}
 	
 	// Copy constructor
@@ -32,7 +33,9 @@ public class Bucket{
 		{
 			throw new RuntimeException("the other bucket is not malloced.");
 		}
-		//TODO Must complete this method for submission
+
+		BucketBlocks = new ArrayList<Block>(max_size_Z);
+		BucketBlocks.addAll(other);
 	}
 	
 	//Implement and add your own methods.
