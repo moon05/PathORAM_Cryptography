@@ -21,6 +21,9 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	private RandForORAMInterface randOram;
 	private int buck_size;
 
+	private int cap;
+	private int comCap;
+
 
 	public ORAMWithReadPathEviction(UntrustedStorageInterface storage, RandForORAMInterface rand_gen, int bucket_size, int num_blocks){
 
@@ -28,16 +31,24 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		this.totalBlocks = num_blocks;
 
 		this.randOram = rand_gen;
-		this.buck_size = buck_size;
+		this.buck_size = bucket_size;
 		this.randOram.setBound(getNumLeaves());
 		this.clientStash = new ArrayList<Block>();
 		this.posMap = new int[totalBlocks];
 
-		this.strg.setCapacity(getNumBuckets());
-		for (int i=0; i<= getNumBuckets(); i++){
-			System.out.println("Bucket number: " + i);
-			this.strg.WriteBucket (i, new Bucket());
+		cap = (int)( Math.ceil (Math.log(totalBlocks) / Math.log(2)) );
+		comCap = (int) Math.pow(2, cap+1) - 1;
+
+		this.strg.setCapacity(comCap);
+		for (int i=0; i< comCap; i++){
+			Bucket tBucket = new Bucket();
+			for (int j=0; j<buck_size; j++){
+				tBucket.addBlock(new Block());
+			}
+			this.strg.WriteBucket (i, tBucket);
+
 		}
+		// System.out.println("treeHeight is: " + treeHeight);
 
 	}
 
@@ -48,15 +59,11 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		int x = posMap[blockIndex];
 		posMap[blockIndex] = randOram.getRandomLeaf();
 		for (int i=0; i<=treeHeight; i++){
-			
-			System.out.println(P(x,i));
-			System.out.println(strg.ReadBucket( P(x,i)).getBlocks());
 			clientStash.addAll( strg.ReadBucket( P(x,i)).getBlocks() );
 		}
+		// System.out.println("ClientSize: " + clientStash.size());
 		byte[] Data = null;
-		System.out.println("Came in after byte alloc");
 		for (int i=0; i<clientStash.size(); i++){
-			System.out.println("Came in first for loop");
 			if (clientStash.get(i).index == blockIndex) {
 				Data = clientStash.get(i).data;
 			}
@@ -75,17 +82,29 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		}
 
 		ArrayList<Block> tStash;
+		
+
 
 		for (int i=treeHeight; i>=0; i--){
 			tStash = new ArrayList<Block>();
-			for (int j=0; j<clientStash.size(); j++){
+						// System.out.println("Getting in here");
+
+			for (int j=0; j<tStash.size(); j++){
 				Block tempBlock = clientStash.get(j);
 				if ( P(x,i) == P(posMap[tempBlock.index], i) ){
 					tStash.add(tempBlock);
 				}
 			}
+			
 			int k = Math.min(tStash.size(), buck_size);
-			for (int j=tStash.size(); j>=k; j--){
+			// System.out.println("k is: " + k);
+			// System.out.println("treeHeight is: " + treeHeight);
+
+			// System.out.println("ClientSize: " + clientStash.size());
+			// System.out.println("Size: " + tStash.size());
+			System.out.println(tStash);
+			for (int j=tStash.size(); j>k; j--){
+				System.out.println(j);
 				tStash.remove(j);
 			}
 			clientStash.removeAll(tStash);
@@ -164,7 +183,7 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	@Override
 	public int getNumBuckets() {
 
-		return (int) (2 * ( Math.pow ( 2, ( Math.ceil (Math.log(totalBlocks) / Math.log(2)) ) ) ) - 1 );
+		return (int) (2 * ( Math.pow ( 2, ( Math.ceil (Math.log(totalBlocks) / Math.log(2)) ) + 1 ) ) - 1 );
 
 	}
 
