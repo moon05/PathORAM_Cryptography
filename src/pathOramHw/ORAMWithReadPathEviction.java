@@ -25,10 +25,19 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	public ORAMWithReadPathEviction(UntrustedStorageInterface storage, RandForORAMInterface rand_gen, int bucket_size, int num_blocks){
 
 		this.strg = storage;
+		this.totalBlocks = num_blocks;
+
 		this.randOram = rand_gen;
 		this.buck_size = buck_size;
-		this.totalBlocks = num_blocks;
 		this.randOram.setBound(getNumLeaves());
+		this.clientStash = new ArrayList<Block>();
+		this.posMap = new int[totalBlocks];
+
+		this.strg.setCapacity(getNumBuckets());
+		for (int i=0; i<= getNumBuckets(); i++){
+			System.out.println("Bucket number: " + i);
+			this.strg.WriteBucket (i, new Bucket());
+		}
 
 	}
 
@@ -37,18 +46,23 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	public byte[] access(Operation op, int blockIndex, byte[] newdata) {
 
 		int x = posMap[blockIndex];
-		posMap[blockIndex] = randOram;
+		posMap[blockIndex] = randOram.getRandomLeaf();
 		for (int i=0; i<=treeHeight; i++){
-			clientStash.addAll( strg.ReadBucket(P(x,i)) );
+			
+			System.out.println(P(x,i));
+			System.out.println(strg.ReadBucket( P(x,i)).getBlocks());
+			clientStash.addAll( strg.ReadBucket( P(x,i)).getBlocks() );
 		}
-		byte Data;
+		byte[] Data = null;
+		System.out.println("Came in after byte alloc");
 		for (int i=0; i<clientStash.size(); i++){
+			System.out.println("Came in first for loop");
 			if (clientStash.get(i).index == blockIndex) {
 				Data = clientStash.get(i).data;
 			}
 		}
 		if (op == Operation.WRITE) {
-
+			ArrayList<Block> tempStash;
 			tempStash = clientStash;
 			for (int i=0; i<tempStash.size(); i++){
 				if (tempStash.get(i).index == blockIndex){
@@ -69,13 +83,15 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 				if ( P(x,i) == P(posMap[tempBlock.index], i) ){
 					tStash.add(tempBlock);
 				}
+			}
 			int k = Math.min(tStash.size(), buck_size);
 			for (int j=tStash.size(); j>=k; j--){
 				tStash.remove(j);
 			}
 			clientStash.removeAll(tStash);
-			strg.WriteBucket(P(x, i), tStash);
-			}
+			Bucket tBucket = new Bucket();
+			tBucket.getBlocks().addAll(tStash);
+			strg.WriteBucket(P(x, i), tBucket);
 		}
 
 		return Data;
@@ -127,7 +143,7 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	@Override
 	public int getNumLeaves() {
 
-		return Math.pow(2,treeHeight);
+		return (int) Math.pow(2,treeHeight);
 	}
 
 
@@ -148,7 +164,7 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	@Override
 	public int getNumBuckets() {
 
-		return 2 * ( Math.pow ( 2, ( Math.ceil (Math.log(totalBlocks) / Math.log(2)) ) ) ) - 1 ;
+		return (int) (2 * ( Math.pow ( 2, ( Math.ceil (Math.log(totalBlocks) / Math.log(2)) ) ) ) - 1 );
 
 	}
 

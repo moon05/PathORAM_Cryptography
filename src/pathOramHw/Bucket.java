@@ -35,7 +35,7 @@ public class Bucket{
 		}
 
 		BucketBlocks = new ArrayList<Block>(max_size_Z);
-		BucketBlocks.addAll(other);
+		BucketBlocks.addAll(other.getBlocks());
 	}
 	
 	//Implement and add your own methods.
