@@ -48,7 +48,6 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 			this.strg.WriteBucket (i, tBucket);
 
 		}
-		// System.out.println("treeHeight is: " + treeHeight);
 
 	}
 
@@ -58,10 +57,10 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 
 		int x = posMap[blockIndex];
 		posMap[blockIndex] = randOram.getRandomLeaf();
+
 		for (int i=0; i<=treeHeight; i++){
-			clientStash.addAll( strg.ReadBucket( P(x,i)).getBlocks() );
+			clientStash.addAll( strg.ReadBucket( P(x,i) ).getBlocks() );
 		}
-		// System.out.println("ClientSize: " + clientStash.size());
 		byte[] Data = null;
 		for (int i=0; i<clientStash.size(); i++){
 			if (clientStash.get(i).index == blockIndex) {
@@ -83,11 +82,8 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 
 		ArrayList<Block> tStash;
 		
-
-
 		for (int i=treeHeight; i>=0; i--){
 			tStash = new ArrayList<Block>();
-						// System.out.println("Getting in here");
 
 			for (int j=0; j<tStash.size(); j++){
 				Block tempBlock = clientStash.get(j);
@@ -102,7 +98,7 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 
 			// System.out.println("ClientSize: " + clientStash.size());
 			// System.out.println("Size: " + tStash.size());
-			System.out.println(tStash);
+
 			for (int j=tStash.size(); j>k; j--){
 				System.out.println(j);
 				tStash.remove(j);

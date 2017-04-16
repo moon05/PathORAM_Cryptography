@@ -31,8 +31,8 @@ public class Job {
 		ORAMInterface oram = new ORAMWithReadPathEviction(storage, rand_gen, bucket_size, num_blocks);
 		
 		//Initialize a buffer value
-		byte[] write_bbuf = new byte[128];
-		for(int i = 0; i < 128; i++)
+		byte[] write_bbuf = new byte[32];
+		for(int i = 0; i < 32; i++)
 		{
 			write_bbuf[i] = (byte) 0xa;
 		}
@@ -44,11 +44,13 @@ public class Job {
 		}
 		
 		for(int i = 0; i < num_blocks; i++){
-			System.out.println("dbg read from " + i + " value is :" + Arrays.toString(oram.access(Operation.READ, i, new byte[128])));
+			System.out.println("dbg read from " + i + " value is :" + Arrays.toString(oram.access(Operation.READ, i, new byte[32])));
 		}
 		long endTime = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println(totalTime);
+
 				
 	}
+	
 }
