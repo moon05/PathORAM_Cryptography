@@ -2,4 +2,4 @@
 # Author:	Abdullah Al Mamun
 # File:		run.sh
 
-java pathOramHw.Job1B
+java -cp src pathOramHw.Job1B
