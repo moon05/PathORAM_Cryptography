@@ -7,16 +7,19 @@
 
 package pathOramHw;
 
-import java.util.Arrays;
+import java.util.*;
 
 import pathOramHw.ORAMInterface.Operation;
 
-public class Job {
+public class Job1B {
 
 	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
 		int bucket_size = 4;
 		int num_blocks = (int) Math.pow(2, 10);
+
+				ArrayList<Integer> NumberMap = new ArrayList<Integer>();
+
 		
 		//Set the Bucket size for all the buckets.
 		Bucket.setMaxSize(bucket_size);
@@ -40,12 +43,35 @@ public class Job {
 //		Do same sample computation: fill an array with numbers, then read it back.
 		for(int i = 0; i < 3000000; i++){
 			oram.access(Operation.WRITE, i % num_blocks, write_bbuf);
-			System.out.println("dbg written block " + i + " has stash size: " + oram.getStashSize());
 		}
 		
-		for(int i = 0; i < num_blocks; i++){
-			System.out.println("dbg read from " + i + " value is :" + Arrays.toString(oram.access(Operation.READ, i, new byte[32])));
+		for(int i = 0; i < 500000000; i++){
+			oram.access(Operation.WRITE, i % num_blocks, write_bbuf);
+
+			int size = NumberMap.size();
+			int StackSize = oram.getStashSize();
+			if (size <= StackSize){
+				for (int j=size; j<StackSize; j++){
+					NumberMap.add(0);
+				}
+				NumberMap.add(1);
+			}
+			else{
+				NumberMap.set(StackSize, NumberMap.get(StackSize)+1);
+			}
+
 		}
+
+		int ASize = NumberMap.size();
+		System.out.println(-1 + "," + 500000000);
+		for (int i=0; i<ASize; i++){
+			int counter = 0;
+			for (int j=i+1; j<ASize; j++){
+				counter += NumberMap.get(j);
+			}
+			System.out.println(i + "," + counter);
+		}
+
 		long endTime = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println(totalTime);
