@@ -21,10 +21,6 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	private RandForORAMInterface randOram;
 	private int buck_size;
 
-	private int cap;
-	private int comCap;
-
-
 	public ORAMWithReadPathEviction(UntrustedStorageInterface storage, RandForORAMInterface rand_gen, int bucket_size, int num_blocks){
 
 		this.strg = storage;
@@ -44,7 +40,7 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		}
 
 		this.strg.setCapacity(getNumBuckets());
-		for (int i=0; i< comCap; i++){
+		for (int i=0; i< getNumBuckets(); i++){
 			Bucket tBucket = new Bucket();
 			// for (int j=0; j<buck_size; j++){
 			// 	tBucket.addBlock(new Block());
