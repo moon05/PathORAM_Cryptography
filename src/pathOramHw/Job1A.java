@@ -42,7 +42,7 @@ public class Job1A {
 //		Do same sample computation: fill an array with numbers, then read it back.
 		for(int i = 0; i < 3000000; i++){
 			oram.access(Operation.WRITE, i % num_blocks, write_bbuf);
-			System.out.println(i);
+			// System.out.println(i);
 		}
 		
 		for(int i = 0; i < 500000; i++){

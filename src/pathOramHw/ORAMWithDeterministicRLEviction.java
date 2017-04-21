@@ -33,19 +33,23 @@ public class ORAMWithDeterministicRLEviction implements ORAMInterface{
 
 		this.randOram = rand_gen;
 		this.buck_size = bucket_size;
-		this.randOram.setBound(getNumLeaves());
 		this.clientStash = new ArrayList<Block>();
 		this.posMap = new int[totalBlocks];
 
-		cap = (int)( Math.ceil (Math.log(totalBlocks) / Math.log(2)) );
-		comCap = (int) Math.pow(2, cap+1) - 1;
 
-		this.strg.setCapacity(comCap);
-		for (int i=0; i< comCap; i++){
-			Bucket tBucket = new Bucket();
-			for (int j=0; j<buck_size; j++){
-				tBucket.addBlock(new Block());
-			}
+		this.treeHeight = (int)( Math.ceil (Math.log(totalBlocks) / Math.log(2)) );;
+		this.randOram.setBound(getNumLeaves());
+
+		for (int i=0; i<posMap.length; i++){
+			posMap[i] = randOram.getRandomLeaf();
+		}
+
+		
+		this.strg.setCapacity(getNumBuckets());
+
+		Bucket tBucket = new Bucket();
+		for (int i=0; i< getNumBuckets(); i++){
+
 			this.strg.WriteBucket (i, tBucket);
 
 		}
@@ -66,10 +70,16 @@ public class ORAMWithDeterministicRLEviction implements ORAMInterface{
 
 		for (int i=0; i<=treeHeight; i++){
 
-			Bucket b = new Bucket();
-			b.getBlocks().addAll(strg.ReadBucket( P(x,i) ).getBlocks());
+			////////////////////////////////////
+			Bucket b = strg.ReadBucket( P(x,i) );
+			int counter = b.returnRealSize();
+			
+			for (int j=0; j<counter; j++){
+				clientStash.add(b.getBlocks().get(j));
+			}	
 
-			if (b.getBlockByKey(blockIndex).index == blockIndex){
+
+			if (b.getBlockByKey(blockIndex) != null){
 				Block rmBlock = new Block();
 				rmBlock = b.getBlockByKey(blockIndex);
 				b.removeBlock(rmBlock);
@@ -138,38 +148,20 @@ public class ORAMWithDeterministicRLEviction implements ORAMInterface{
 		int rev = ReverseBits(k);
 		return rev;
 	}
-	public static int ReverseBits(int k){
-        if (k == 1){
-            return 2;
-        }else if (k > 1){
-            String a = new StringBuilder(Integer.toBinaryString(k)).reverse().toString();
-            return Integer.parseInt(a, 2);
-        }else{
-            return -1;
-        }
+	public int ReverseBits(int k){
+        String a = new StringBuilder(Integer.toBinaryString(k)).reverse().toString();
+        return Integer.parseUnsignedInt(a, 2);
 	}
 
 
 	@Override
 	public int P(int leaf, int level) {
 
-		return BinSearch(0, getNumLeaves(), 2*leaf, level);
+		int a = (int) Math.pow(2, treeHeight-level);
+		int b = 2 *(leaf/a) + 1;
+		return a*b - 1;
 	}
 
-	//helper function for P(leaf, level)
-	public int BinSearch(int left, int right, int leaf, int level){
-		int mid = (right + left) / 2 ;
-		if (level == 0){
-			return mid;
-		}
-		if (leaf <= mid){
-			return BinSearch(left, mid-1, leaf, level-1);
-		}
-		else {
-			return BinSearch(mid+1, right, leaf, level-1);
-		}
-
-	}
 
 	@Override
 	public ArrayList<Block> getStash() {
@@ -205,7 +197,7 @@ public class ORAMWithDeterministicRLEviction implements ORAMInterface{
 	@Override
 	public int getNumBuckets() {
 
-		return (int) (2 * ( Math.pow ( 2, ( Math.ceil (Math.log(totalBlocks) / Math.log(2)) ) + 1 ) ) - 1 );
+		return (int) Math.pow(2, this.treeHeight+1) - 1;
 	}
 	
 	public int getGlobalG() {

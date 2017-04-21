@@ -44,10 +44,7 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 
 		Bucket tBucket = new Bucket();
 		for (int i=0; i< getNumBuckets(); i++){
-			// Bucket tBucket = new Bucket();
-			// for (int j=0; j<buck_size; j++){
-			// 	tBucket.addBlock(new Block());
-			// }
+
 			this.strg.WriteBucket (i, tBucket);
 
 		}
@@ -71,7 +68,6 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 				clientStash.add(tempBucket.getBlocks().get(j));
 			}
 		}
-		//System.out.println(clientStash.size());
 
 		byte[] Data = null;
 		for (int i=0; i<clientStash.size(); i++){
@@ -105,15 +101,12 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 			}
 			
 			int k = Math.min(tStash.size(), buck_size);
-			// System.out.println("k is: " + k);
-			// System.out.println("treeHeight is: " + treeHeight);
 
-			// System.out.println("ClientSize: " + clientStash.size());
-			// System.out.println("Size: " + tStash.size());
+
 			tStash.removeAll(tStash.subList(k, tStash.size()));
 			clientStash.removeAll(tStash);
 			Bucket tBucket = new Bucket();
-			// tBucket.getBlocks().addAll(tStash);
+
 
 			for (int m=0; m<tStash.size(); m++){
 				tBucket.addBlock(tStash.get(m));
@@ -121,7 +114,6 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 			strg.WriteBucket(P(x, i), tBucket);
 		}
 
-		//System.out.println(clientStash.size());
 
 		return Data;
 	}
@@ -130,25 +122,9 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	@Override
 	public int P(int leaf, int level) {
 
-		// return BinSearch(0, getNumLeaves(), 2*leaf, level);
-		int a = Math.pow(2, treeHeight-level);
+		int a = (int) Math.pow(2, treeHeight-level);
 		int b = 2 *(leaf/a) + 1;
 		return a*b - 1;
-	}
-
-	//helper function for P(leaf, level)
-	public int BinSearch(int left, int right, int leaf, int level){
-		int mid = (right + left) / 2 ;
-		if (level == 0){
-			return mid;
-		}
-		if (leaf <= mid){
-			return BinSearch(left, mid-1, leaf, level-1);
-		}
-		else {
-			return BinSearch(mid+1, right, leaf, level-1);
-		}
-
 	}
 
 
