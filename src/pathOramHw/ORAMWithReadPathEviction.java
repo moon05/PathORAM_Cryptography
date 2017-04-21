@@ -59,8 +59,17 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		posMap[blockIndex] = randOram.getRandomLeaf();
 
 		for (int i=0; i<=treeHeight; i++){
-			clientStash.addAll( strg.ReadBucket( P(x,i) ).getBlocks() );
+			// clientStash.addAll( strg.ReadBucket( P(x,i) ).getBlocks() );
+
+			ArrayList<Block> tempBlockArray = new ArrayList<Block>();
+			tempBlockArray = strg.ReadBucket( P(x,i).getBlocks() );
+			for (int j=0; j<=tempBlockArray.size(); j++){
+				if !(tempBlockArray.get(j).index == -1){
+					clientStash.add(tempBlockArray.get(j));
+				}
+			}
 		}
+		
 		byte[] Data = null;
 		for (int i=0; i<clientStash.size(); i++){
 			if (clientStash.get(i).index == blockIndex) {
