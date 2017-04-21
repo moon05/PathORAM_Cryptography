@@ -42,9 +42,9 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		this.strg.setCapacity(comCap);
 		for (int i=0; i< comCap; i++){
 			Bucket tBucket = new Bucket();
-			for (int j=0; j<buck_size; j++){
-				tBucket.addBlock(new Block());
-			}
+			// for (int j=0; j<buck_size; j++){
+			// 	tBucket.addBlock(new Block());
+			// }
 			this.strg.WriteBucket (i, tBucket);
 
 		}
@@ -61,14 +61,14 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		for (int i=0; i<=treeHeight; i++){
 			// clientStash.addAll( strg.ReadBucket( P(x,i) ).getBlocks() );
 
-			ArrayList<Block> tempBlockArray = new ArrayList<Block>();
-			tempBlockArray = strg.ReadBucket( P(x,i) ).getBlocks() ;
-			int counter = strg.ReadBucket( P(x,i) ).returnRealSize();
+			Bucket tempBucket = strg.ReadBucket( P(x,i) );
+			int counter = tempBucket.returnRealSize();
 			
 			for (int j=0; j<counter; j++){
-				clientStash.add(tempBlockArray.get(j));
+				clientStash.add(tempBucket.getBlocks().get(j));
 			}
 		}
+		//System.out.println(clientStash.size());
 
 		byte[] Data = null;
 		for (int i=0; i<clientStash.size(); i++){
@@ -94,7 +94,7 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		for (int i=treeHeight; i>=0; i--){
 			tStash = new ArrayList<Block>();
 
-			for (int j=0; j<tStash.size(); j++){
+			for (int j=0; j<clientStash.size(); j++){
 				Block tempBlock = clientStash.get(j);
 				if ( P(x,i) == P(posMap[tempBlock.index], i) ){
 					tStash.add(tempBlock);
@@ -107,16 +107,18 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 
 			// System.out.println("ClientSize: " + clientStash.size());
 			// System.out.println("Size: " + tStash.size());
-
-			for (int j=tStash.size(); j>k; j--){
-				System.out.println(j);
-				tStash.remove(j);
-			}
+			tStash.removeAll(tStash.subList(k, tStash.size()));
 			clientStash.removeAll(tStash);
 			Bucket tBucket = new Bucket();
-			tBucket.getBlocks().addAll(tStash);
+			// tBucket.getBlocks().addAll(tStash);
+
+			for (int m=0; m<tStash.size(); m++){
+				tBucket.addBlock(tStash.get(m));
+			}
 			strg.WriteBucket(P(x, i), tBucket);
 		}
+
+		//System.out.println(clientStash.size());
 
 		return Data;
 	}

@@ -14,7 +14,7 @@ public class Bucket{
 	private static int max_size_Z = -1;
 
 	private ArrayList<Block> BucketBlocks;
-	private int size;
+	protected int size; // this is the counter I added
 	
 	//TODO Add necessary variables
 	
@@ -25,7 +25,10 @@ public class Bucket{
 		}
 		//TODO Must complete this method for submission
 		BucketBlocks = new ArrayList<Block>(max_size_Z);
-		size = 0;
+		for (int i = 0; i<max_size_Z; i++){
+			BucketBlocks.add(new Block());
+		}
+		size = 0; // this is where i initialized it
 	}
 	
 	// Copy constructor
@@ -35,9 +38,11 @@ public class Bucket{
 		{
 			throw new RuntimeException("the other bucket is not malloced.");
 		}
-
 		BucketBlocks = new ArrayList<Block>(max_size_Z);
-		BucketBlocks.addAll(other.getBlocks());
+		for (int i=0; i<other.getBlocks().size(); i++){
+			BucketBlocks.add(new Block(other.getBlocks().get(i)));
+		}
+		size = other.size;
 	}
 	
 	//Implement and add your own methods.
@@ -54,7 +59,8 @@ public class Bucket{
 	
 	void addBlock(Block new_blk){
 
-		BucketBlocks.add(new_blk);
+		BucketBlocks.set(size, new_blk);
+		// BucketBlocks.add(new_blk);
 		size++;
 	}
 	
@@ -63,6 +69,7 @@ public class Bucket{
 		for (int i=0; i<BucketBlocks.size(); i++){
 			if (BucketBlocks.get(i).index == rm_blk.index){
 				BucketBlocks.remove(i);
+				BucketBlocks.add(new Block());
 				size--;
 				return true;
 			}

@@ -50,6 +50,7 @@ public class Job1A {
 
 			int size = NumberMap.size();
 			int StackSize = oram.getStashSize();
+			//System.out.println(StackSize);
 			if (size <= StackSize){
 				for (int j=size; j<StackSize; j++){
 					NumberMap.add(0);
