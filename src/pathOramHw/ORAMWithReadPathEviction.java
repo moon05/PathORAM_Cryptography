@@ -63,10 +63,10 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 
 			ArrayList<Block> tempBlockArray = new ArrayList<Block>();
 			tempBlockArray = strg.ReadBucket( P(x,i) ).getBlocks() ;
-			for (int j=0; j<tempBlockArray.size(); j++){
-				if (tempBlockArray.get(j).index != -1){
-					clientStash.add(tempBlockArray.get(j));
-				}
+			int counter = strg.ReadBucket( P(x,i) ).returnRealSize();
+			
+			for (int j=0; j<counter; j++){
+				clientStash.add(tempBlockArray.get(j));
 			}
 		}
 
