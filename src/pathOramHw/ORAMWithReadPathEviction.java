@@ -39,9 +39,12 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 			posMap[i] = randOram.getRandomLeaf();
 		}
 
+		
 		this.strg.setCapacity(getNumBuckets());
+
+		Bucket tBucket = new Bucket();
 		for (int i=0; i< getNumBuckets(); i++){
-			Bucket tBucket = new Bucket();
+			// Bucket tBucket = new Bucket();
 			// for (int j=0; j<buck_size; j++){
 			// 	tBucket.addBlock(new Block());
 			// }
@@ -127,7 +130,10 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	@Override
 	public int P(int leaf, int level) {
 
-		return BinSearch(0, getNumLeaves(), 2*leaf, level);
+		// return BinSearch(0, getNumLeaves(), 2*leaf, level);
+		int a = Math.pow(2, treeHeight-level);
+		int b = 2 *(leaf/a) + 1;
+		return a*b - 1;
 	}
 
 	//helper function for P(leaf, level)
