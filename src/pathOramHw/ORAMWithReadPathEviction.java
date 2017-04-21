@@ -32,17 +32,13 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 
 		this.randOram = rand_gen;
 		this.buck_size = bucket_size;
-		this.randOram.setBound(getNumLeaves());
 		this.clientStash = new ArrayList<Block>();
 		this.posMap = new int[totalBlocks];
 
+		this.treeHeight = (int)( Math.ceil (Math.log(totalBlocks) / Math.log(2)) );;
+		this.randOram.setBound(getNumLeaves());
 
-		cap = (int)( Math.ceil (Math.log(totalBlocks) / Math.log(2)) );
-		this.treeHeight = (int) Math.pow(2, cap);
-
-		comCap = (int) Math.pow(2, cap+1) - 1;
-
-		this.strg.setCapacity(comCap);
+		this.strg.setCapacity(getNumBuckets());
 		for (int i=0; i< comCap; i++){
 			Bucket tBucket = new Bucket();
 			// for (int j=0; j<buck_size; j++){
@@ -193,7 +189,7 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 	@Override
 	public int getNumBuckets() {
 
-		return (int) (2 * ( Math.pow ( 2, ( Math.ceil (Math.log(totalBlocks) / Math.log(2)) ) + 1 ) ) - 1 );
+		return (int) Math.pow(2, this.treeHeight+1) - 1;
 
 	}
 
