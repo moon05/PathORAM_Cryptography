@@ -14,6 +14,7 @@ public class Bucket{
 	private static int max_size_Z = -1;
 
 	private ArrayList<Block> BucketBlocks;
+	private int size;
 	
 	//TODO Add necessary variables
 	
@@ -24,6 +25,7 @@ public class Bucket{
 		}
 		//TODO Must complete this method for submission
 		BucketBlocks = new ArrayList<Block>(max_size_Z);
+		size = 0;
 	}
 	
 	// Copy constructor
@@ -53,6 +55,7 @@ public class Bucket{
 	void addBlock(Block new_blk){
 
 		BucketBlocks.add(new_blk);
+		size++;
 	}
 	
 	boolean removeBlock(Block rm_blk)
@@ -60,6 +63,7 @@ public class Bucket{
 		for (int i=0; i<BucketBlocks.size(); i++){
 			if (BucketBlocks.get(i).index == rm_blk.index){
 				BucketBlocks.remove(i);
+				size--;
 				return true;
 			}
 		}
@@ -74,7 +78,7 @@ public class Bucket{
 	
 	int returnRealSize(){
 
-		return BucketBlocks.size();
+		return size;
 	}
 
 	static void resetState()
