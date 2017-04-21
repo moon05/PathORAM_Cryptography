@@ -36,7 +36,10 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		this.clientStash = new ArrayList<Block>();
 		this.posMap = new int[totalBlocks];
 
+
 		cap = (int)( Math.ceil (Math.log(totalBlocks) / Math.log(2)) );
+		this.treeHeight = (int) Math.pow(2, cap);
+
 		comCap = (int) Math.pow(2, cap+1) - 1;
 
 		this.strg.setCapacity(comCap);
