@@ -34,12 +34,14 @@ public class ORAMWithReadPathEviction implements ORAMInterface{
 		this.buck_size = bucket_size;
 		this.clientStash = new ArrayList<Block>();
 		this.posMap = new int[totalBlocks];
-		for (int i=0; i<posMap.length; i++){
-			posMap[i] = randOram.getRandomLeaf();
-		}
+
 
 		this.treeHeight = (int)( Math.ceil (Math.log(totalBlocks) / Math.log(2)) );;
 		this.randOram.setBound(getNumLeaves());
+
+		for (int i=0; i<posMap.length; i++){
+			posMap[i] = randOram.getRandomLeaf();
+		}
 
 		this.strg.setCapacity(getNumBuckets());
 		for (int i=0; i< comCap; i++){
